@@ -15,17 +15,17 @@ async def health():
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    answer = assistant_service.chat(request.session_id, request.user_id, request.message)
+    answer = await assistant_service.chat(request.session_id, request.user_id, request.message)
     return ChatResponse(session_id=request.session_id, answer=answer)
 
 
 @router.post("/chat-stream")
 async def chat_stream(request: ChatRequest):
-    answer = assistant_service.chat(request.session_id, request.user_id, request.message)
-
     async def event_generator():
-        for line in answer.split("\n"):
-            yield f"data: {line}\n\n"
+        async for chunk in assistant_service.chat_stream(
+            request.session_id, request.user_id, request.message
+        ):
+            yield f"data: {chunk}\n\n"
         yield "event: done\ndata: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -49,6 +49,18 @@ python run.py
 
 默认地址：`http://localhost:8291`
 
+## 环境变量
+
+参考 `.env.example` 配置以下变量后启动：
+
+- `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_MODEL_NAME`
+- `OPENAI_SMALL_API_KEY` / `OPENAI_SMALL_BASE_URL` / `OPENAI_SMALL_MODEL_NAME`
+
+说明：
+- 主模型用于一般回复；
+- 小模型用于短输入场景（当前按消息长度自动选择）；
+- 若 LLM 调用失败，服务会自动回退到规则回复，保障可用性。
+
 ## 已提供接口
 
 - `GET /agent/health`：健康检查
