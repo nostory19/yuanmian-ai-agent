@@ -48,6 +48,7 @@ python run.py
 ```
 
 默认地址：`http://localhost:8291`
+运行访问： `http://0.0.0.0:8291/docs` 查看 Swagger UI API 文档
 
 ## 环境变量
 

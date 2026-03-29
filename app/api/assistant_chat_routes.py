@@ -2,27 +2,33 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
 from app.api.models import ChatRequest, ChatResponse
-from app.application.assistant_app_service import AssistantAppService
+from app.application.simple_assistant_service import SimpleAssistantService
 
-router = APIRouter(prefix="/agent", tags=["agent"])
-assistant_service = AssistantAppService()
+router = APIRouter(prefix="/assistant", tags=["assistant"])
+simple_service = SimpleAssistantService()
 
 
 @router.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "mode": "simple-llm"}
 
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    resp = await assistant_service.chat(request.session_id, request.user_id, request.message)
-    return ChatResponse(**resp)
+    resp = await simple_service.chat(
+        request.session_id, request.user_id, request.message
+    )
+    return ChatResponse(
+        session_id=resp["session_id"],
+        answer=resp["answer"],
+        source=resp.get("source", "simple-llm"),
+    )
 
 
 @router.post("/chat-stream")
 async def chat_stream(request: ChatRequest):
     async def event_generator():
-        async for chunk in assistant_service.chat_stream(
+        async for chunk in simple_service.chat_stream(
             request.session_id, request.user_id, request.message
         ):
             yield f"data: {chunk}\n\n"
